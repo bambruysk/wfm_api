@@ -1,0 +1,15 @@
+swagger: "2.0"
+info:
+  title: WFM Shop API
+  description: WFM Test Shop API
+  version: 1.0.0
+host: www
+schemes:
+  - https
+paths:
+  - api
+  - api/goods
+
+
+
+  

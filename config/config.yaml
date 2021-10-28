@@ -1,0 +1,7 @@
+server: localhost
+database:
+  host: localhost
+  port: 5433
+  user: wfm_user
+  password: wfm_pa$$wd
+  dbname: wfm_db

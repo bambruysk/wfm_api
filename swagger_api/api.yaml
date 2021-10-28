@@ -1,0 +1,345 @@
+openapi: 3.0.3
+info:
+  title: My Shop
+  description: My Shop
+  version: 1.0.0
+
+servers:
+  - url: https://{server_addr}:{port}/v1
+    variables:
+      server_port:
+        default: localhost
+        description: Server address
+      port:
+        enum:
+          - '443'
+          - '8443'
+        default: '443'
+
+    description:  My Shop
+
+
+security:
+  - BearerAuth:
+      []
+
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    User:
+      type: object
+      properties:
+        account:
+          type: string
+        password:
+          type: string
+        type:
+          type: string
+          enum:
+            - client
+            - manager
+            - admin
+        id:
+          type: integer
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+
+    Good:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+
+      required:
+        - id
+        - name
+        - description
+        - count
+
+    Cart:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+        created_by:
+          type: object
+          format: User
+      required:
+        - id
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+      required:
+        - code
+        - message
+paths:
+  /goods:
+    get:
+      summary: List all goods
+      operationId: listGoods
+      tags:
+        - goods
+      parameters:
+        - name: goodId
+          in : query
+          description:  Get concrete good
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: How many items to return at one time (max 100)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: get good's response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Good'
+    post:
+      summary: Create new good
+      operationId: createGood
+      tags:
+        - goods
+      parameters:
+        - name: name
+          in: query
+          description: Name of good
+          required: true
+          schema:
+            type: string
+        - name : description
+          in: query
+          description: Description of good
+          required: true
+          schema:
+            type: string
+        - name: count
+          in: query
+          description: Count of good on stock
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: post good's response
+
+  /goods/{id}:
+    get:
+      summary: Get good
+      operationId: getGood
+      tags:
+        - goods
+      parameters:
+        - name: id
+          in : path
+          description:  Get concrete good
+          required: false
+          $ref: '#/components/schemas/Good'
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: get good's response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Good'
+        '404':
+          description: get good not found
+
+    post:
+      summary: Create new good
+      operationId: createGood
+      tags:
+        - goods
+      parameters:
+        - name: name
+          in: query
+          description: Name of good
+          required: true
+          schema:
+            type: string
+        - name : description
+          in: query
+          description: Description of good
+          required: true
+          schema:
+            type: string
+        - name: count
+          in: query
+          description: Count of good on stock
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: post good's response
+
+    put:
+      summary: Update good
+      operationId: updateGood
+      tags:
+        - goods
+      parameters:
+        - name: name
+          in: query
+          description: Name of good
+          required: false
+          schema:
+            type: string
+        - name: description
+          in: query
+          description: Description of good
+          required: false
+          schema:
+            type: string
+        - name: count
+          in: query
+          description: Count of good on stock
+          required: false
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: put good responce
+
+    delete:
+      summary: Delete good
+      operationId: deleteGood
+      tags:
+        - goods
+      responses:
+        '204':
+          description: put good responce
+
+
+
+  /carts:
+    get:
+      summary: List all carts
+      tags:
+        - carts
+      parameters:
+        - name: cartId
+          in : query
+          description: Get concrete cart
+          required: false
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: get good's response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
+
+  /carts/{id}:
+    get:
+      summary: Get cart
+      tags:
+        - carts
+      responses:
+        '200':
+          description: get good's response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
+        '404':
+          description:  good not found
+          content:
+            $ref: '#/component/schemas/Error'
+      parameters:
+        - name: id
+          in: path
+          description: Get concrete cart
+          required: false
+          schema:
+            type: integer
+
+  /login:
+    get:
+      description: Summary get auth token
+      tags:
+        - auth
+      security: []
+
+      parameters:
+        - name : account
+          in : query
+          description: Account
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: Password
+          required: true
+          schema:
+            type: string
+
+
+
+
+
+
+
+  
